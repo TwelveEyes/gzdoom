@@ -82,10 +82,7 @@ EXTERN_CVAR(Float, r_actorspriteshadowfadeheight)
 
 CVAR(Bool, gl_usecolorblending, true, CVAR_ARCHIVE | CVAR_GLOBALCONFIG)
 CVAR(Bool, gl_sprite_blend, false, CVAR_ARCHIVE | CVAR_GLOBALCONFIG);
-CVAR(Int, gl_spriteclip, -1, CVAR_ARCHIVE)
-CVAR(Bool, gl_spriteclipupdate, false, CVAR_ARCHIVE)
-CVAR(Bool, r_debug_nolimitanamorphoses, false, 0)
-CVAR(Float, r_spriteclipanamorphicminbias, 0.6, CVAR_ARCHIVE)
+CVAR(Int, gl_spriteclip, 1, CVAR_ARCHIVE)
 CVAR(Bool, r_debug_nolimitanamorphoses, false, 0)
 CVAR(Float, r_spriteclipanamorphicminbias, 0.6, CVAR_ARCHIVE)
 CVAR(Float, gl_sclipthreshold, 10.0, CVAR_ARCHIVE)
@@ -664,12 +661,6 @@ void HWSprite::SplitSprite(HWDrawInfo *di, sector_t * frontsector, bool transluc
 
 void HWSprite::PerformSpriteClipAdjustment(AActor *thing, const DVector2 &thingpos, float spriteheight)
 {
-	if (!(gl_spriteclipupdate))
-	{
-		// introduce anamorphic sprite clipping
-		gl_spriteclipupdate = true;
-		gl_spriteclip = -1;
-	}
 	const float NO_VAL = 100000000.0f;
 	bool clipthing = (thing->player || thing->flags3&MF3_ISMONSTER || thing->IsKindOf(NAME_Inventory)) && (thing->flags&MF_ICECORPSE || !(thing->flags&MF_CORPSE));
 	bool smarterclip = !clipthing && gl_spriteclip == 3;
