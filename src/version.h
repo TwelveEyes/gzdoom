@@ -47,7 +47,6 @@ const char *GetVersionString();
 #define RC_FILEVERSION 0,0,9999,0
 #define RC_PRODUCTVERSION 0,0,9999,0
 #define RC_PRODUCTVERSION2 VERSIONSTR
-
 // These are for content versioning.
 #define VER_MAJOR 1
 #define VER_MINOR 0
