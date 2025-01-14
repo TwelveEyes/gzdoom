@@ -55,7 +55,7 @@ const char *GetVersionString();
 
 // These are for zscript versioning.
 #define ZSCRIPT_VER_MAJOR 4
-#define ZSCRIPT_VER_MINOR 12
+#define ZSCRIPT_VER_MINOR 14
 #define ZSCRIPT_VER_REVISION 0
 
 // This should always refer to the VkDoom version a derived port is based on and not reflect the derived port's version number!
@@ -99,6 +99,7 @@ const char *GetVersionString();
 // This is so that derivates can use the same savegame versions without worrying about engine compatibility
 #define GAMESIG "HANDSOFNECROMANCY"
 #define BASEWAD "engine-vkdoom.pk3"
+// Set OPTIONALWAD to "" (null) to disable searching for it
 #define OPTIONALWAD "game_support.pk3"
 #define GZDOOM 1
 #define VR3D_ENABLED
@@ -108,8 +109,8 @@ const char *GetVersionString();
 #define WGAMENAME L"Hands of Necromancy"
 #define GAMENAMELOWERCASE "handsofnecromancy"
 #define QUERYIWADDEFAULT false
-#define FORUM_URL "http://forum.zdoom.org/"
-#define BUGS_FORUM_URL	"http://forum.zdoom.org/viewforum.php?f=2"
+//#define FORUM_URL "http://forum.zdoom.org/"
+//#define BUGS_FORUM_URL	"http://forum.zdoom.org/viewforum.php?f=2"
 // For QUERYIWADDEFAULT: Set to 'true' to always show dialog box on startup by default, 'false' to disable.
 // Should set to 'false' for standalone games, and set to 'true' for regular source port forks that are meant to run any game.
 
@@ -119,7 +120,7 @@ const char *GetVersionString();
 #define GAME_DIR ".config/" GAMENAMELOWERCASE
 #endif
 
-#define DEFAULT_DISCORD_APP_ID "951303644597325885"
+#define DEFAULT_DISCORD_APP_ID "1303107445471838258"
 
 const int SAVEPICWIDTH = 216;
 const int SAVEPICHEIGHT = 162;
