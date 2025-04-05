@@ -107,7 +107,7 @@ LightProbe* FindLightProbe(FLevelLocals* level, float x, float y, float z)
 //
 //==========================================================================
 
-void HWDrawInfo::GetDynSpriteLight(AActor *self, float x, float y, float z, sector_t *sec, int portalgroup, float *out)
+void HWDrawInfo::GetDynSpriteLight(AActor *self, float x, float y, float z, FSection *sec, int portalgroup, float *out)
 {
 	FDynamicLight *light;
 	float frac, lr, lg, lb;
@@ -215,11 +215,11 @@ void HWDrawInfo::GetDynSpriteLight(AActor *thing, particle_t *particle, float *o
 {
 	if (thing != NULL)
 	{
-		GetDynSpriteLight(thing, (float)thing->X(), (float)thing->Y(), (float)thing->Center(), thing->section->sector, thing->Sector->PortalGroup, out);
+		GetDynSpriteLight(thing, (float)thing->X(), (float)thing->Y(), (float)thing->Center(), thing->section, thing->Sector->PortalGroup, out);
 	}
 	else if (particle != NULL)
 	{
-		GetDynSpriteLight(NULL, (float)particle->Pos.X, (float)particle->Pos.Y, (float)particle->Pos.Z, particle->subsector->section->sector, particle->subsector->sector->PortalGroup, out);
+		GetDynSpriteLight(NULL, (float)particle->Pos.X, (float)particle->Pos.Y, (float)particle->Pos.Z, particle->subsector->section, particle->subsector->sector->PortalGroup, out);
 	}
 }
 
@@ -248,7 +248,7 @@ void hw_GetDynModelLight(AActor *self, FDynLightData &modellightdata)
 		{
 			auto section = subsector->section;
 			if (section->validcount == dl_validcount) return;	// already done from a previous subsector.
-			auto flatLightList = self->Level->lightlists.flat_dlist.find(subsector->sector);
+			auto flatLightList = self->Level->lightlists.flat_dlist.find(subsector->section);
 			if (flatLightList != self->Level->lightlists.flat_dlist.end())
 			{
 				for (auto nodeIterator = flatLightList->second.begin(); nodeIterator != flatLightList->second.end(); nodeIterator++)
