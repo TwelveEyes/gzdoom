@@ -427,7 +427,7 @@ void HWWall::SetupLights(HWDrawInfo*di, FDynLightData &lightdata)
 	if ((seg->sidedef->Flags & WALLF_POLYOBJ) && sub)
 	{
 		// Polobject segs cannot be checked per sidedef so use the subsector instead.
-		auto flatLightList = di->Level->lightlists.flat_dlist.find(sub->sector);
+		auto flatLightList = di->Level->lightlists.flat_dlist.find(sub->section);
 
 		if (flatLightList != di->Level->lightlists.flat_dlist.end())
 		{
