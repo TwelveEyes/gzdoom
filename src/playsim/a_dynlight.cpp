@@ -550,7 +550,54 @@ void FDynamicLight::CollectWithinRadius(const DVector3 &opos, FSection *section,
 		auto pos = collected_ss[i].pos;
 		section = collected_ss[i].sect;
 
-		touching_sector = AddLightNode(&section->lighthead, section, this, touching_sector);
+		auto updateFlatTList = [&](sector_t *sec)
+		{
+			if (flat_tlist.empty())
+			{
+				std::unordered_map<sector_t *, sector_t *> m = { {sec, sec} };
+				flat_tlist = m;
+			}
+			else
+			{
+				flat_tlist.emplace(sec, sec);
+			}
+		};
+		auto updateWallTList = [&](side_t *sidedef)
+		{
+			if (wall_tlist.empty())
+			{
+				std::unordered_map<side_t *, side_t *> m = { {sidedef, sidedef} };
+				wall_tlist = m;
+			}
+			else
+			{
+				wall_tlist.emplace(sidedef, sidedef);
+			}
+		};
+
+		FLightNode * node = new FLightNode;
+		node->targ = section;
+		node->lightsource = this;
+
+		auto flatLightList = Level->lightlists.flat_dlist.find(section->sector);
+		if (flatLightList != Level->lightlists.flat_dlist.end())
+		{
+			auto ret = flatLightList->second.emplace(this, node);
+			if (ret.second)
+			{
+				updateFlatTList(section->sector);
+			}
+			else
+			{
+				delete node;
+			}
+		}
+		else
+		{
+			std::unordered_map<FDynamicLight *, FLightNode *> u = { {this, node} };
+			Level->lightlists.flat_dlist.emplace(section->sector, u);
+			updateFlatTList(section->sector);
+		}
 
 
 		auto processSide = [&](side_t *sidedef, const vertex_t *v1, const vertex_t *v2)
@@ -562,7 +609,30 @@ void FDynamicLight::CollectWithinRadius(const DVector3 &opos, FSection *section,
 				if ((pos.Y - v1->fY()) * (v2->fX() - v1->fX()) + (v1->fX() - pos.X) * (v2->fY() - v1->fY()) <= 0)
 				{
 					linedef->validcount = ::validcount;
-					touching_sides = AddLightNode(&sidedef->lighthead, sidedef, this, touching_sides);
+
+					FLightNode * node = new FLightNode;
+					node->targ = sidedef;
+					node->lightsource = this;
+
+					auto wallLightList = Level->lightlists.wall_dlist.find(sidedef);
+					if (wallLightList != Level->lightlists.wall_dlist.end())
+					{
+						auto ret = wallLightList->second.emplace(this, node);
+						if (ret.second)
+						{
+							updateWallTList(sidedef);
+						}
+						else
+						{
+							delete node;
+						}
+					}
+					else
+					{
+						std::unordered_map<FDynamicLight *, FLightNode *> u = { {this, node} };
+						Level->lightlists.wall_dlist.emplace(sidedef, u);
+						updateWallTList(sidedef);
+					}
 				}
 				else if (linedef->sidedef[0] == sidedef && linedef->sidedef[1] == nullptr)
 				{
@@ -664,22 +734,6 @@ void FDynamicLight::CollectWithinRadius(const DVector3 &opos, FSection *section,
 
 void FDynamicLight::LinkLight()
 {
-	// mark the old light nodes
-	FLightNode * node;
-	
-	node = touching_sides;
-	while (node)
-    {
-		node->lightsource = nullptr;
-		node = node->nextTarget;
-    }
-	node = touching_sector;
-	while (node)
-	{
-		node->lightsource = nullptr;
-		node = node->nextTarget;
-	}
-
 	if (radius>0)
 	{
 		// passing in radius*radius allows us to do a distance check without any calls to sqrt
@@ -689,31 +743,6 @@ void FDynamicLight::LinkLight()
 		::validcount++;
 		CollectWithinRadius(Pos, sect, float(radius*radius));
 
-	}
-		
-	// Now delete any nodes that won't be used. These are the ones where
-	// m_thing is still nullptr.
-	
-	node = touching_sides;
-	while (node)
-	{
-		if (node->lightsource == nullptr)
-		{
-			node = DeleteLightNode(node);
-		}
-		else
-			node = node->nextTarget;
-	}
-
-	node = touching_sector;
-	while (node)
-	{
-		if (node->lightsource == nullptr)
-		{
-			node = DeleteLightNode(node);
-		}
-		else
-			node = node->nextTarget;
 	}
 }
 
@@ -725,8 +754,38 @@ void FDynamicLight::LinkLight()
 //==========================================================================
 void FDynamicLight::UnlinkLight ()
 {
-	while (touching_sides) touching_sides = DeleteLightNode(touching_sides);
-	while (touching_sector) touching_sector = DeleteLightNode(touching_sector);
+	for (auto iter = wall_tlist.begin(); iter != wall_tlist.end(); iter++)
+	{
+		auto sidedef = iter->second;
+		if (!sidedef) continue;
+		
+		auto wallLightList = Level->lightlists.wall_dlist.find(sidedef);
+		if (wallLightList != Level->lightlists.wall_dlist.end())
+		{
+			auto light = wallLightList->second.find(this);
+			if (light != wallLightList->second.end())
+			{
+				delete light->second;
+				wallLightList->second.erase(light);
+			}
+		}
+	}
+	for (auto iter = flat_tlist.begin(); iter != flat_tlist.end(); iter++)
+	{
+		auto sec = iter->second;
+		if (!sec) continue;
+		
+		auto flatLightList = Level->lightlists.flat_dlist.find(sec);
+		if (flatLightList != Level->lightlists.flat_dlist.end())
+		{
+			auto light = flatLightList->second.find(this);
+			if (light != flatLightList->second.end())
+			{
+				delete light->second;
+				flatLightList->second.erase(light);
+			}
+		}
+	}
 	shadowmapped = false;
 }
 

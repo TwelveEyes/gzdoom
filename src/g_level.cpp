@@ -623,6 +623,26 @@ void G_InitNew (const char *mapname, bool bTitleLevel)
 		primaryLevel->totaltime = 0;
 		primaryLevel->spawnindex = 0;
 
+		for (auto iter = primaryLevel->lightlists.wall_dlist.begin(); iter != primaryLevel->lightlists.wall_dlist.end();)
+		{
+			for (auto iter2 = iter->second.begin(); iter2 != iter->second.end();)
+			{
+				iter2 = iter->second.erase(iter2);
+			}
+			iter = primaryLevel->lightlists.wall_dlist.erase(iter);
+		}
+		primaryLevel->lightlists.wall_dlist.clear();
+
+		for (auto iter = primaryLevel->lightlists.flat_dlist.begin(); iter != primaryLevel->lightlists.flat_dlist.end();)
+		{
+			for (auto iter2 = iter->second.begin(); iter2 != iter->second.end();)
+			{
+				iter2 = iter->second.erase(iter2);
+			}
+			iter = primaryLevel->lightlists.flat_dlist.erase(iter);
+		}
+		primaryLevel->lightlists.flat_dlist.clear();
+
 		if (!multiplayer || !deathmatch)
 		{
 			InitPlayerClasses ();
