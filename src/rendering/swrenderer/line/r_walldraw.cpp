@@ -209,12 +209,20 @@ namespace swrenderer
 
 	FLightNode* RenderWallPart::GetLightList()
 	{
+		while (light_list)
+		{
+			// Clear out the wall part light list
+			FLightNode *next = nullptr;
+			if (light_list->nextLight) next = light_list->nextLight;
+			delete light_list;
+			if (next) light_list = next;
+		}
+
 		CameraLight* cameraLight = CameraLight::Instance();
 		if ((cameraLight->FixedLightLevel() >= 0) || cameraLight->FixedColormap())
 			return nullptr; // [SP] Don't draw dynlights if invul/lightamp active
 		else if (curline && curline->sidedef)
 		{
-			bool noLights = true;
 			auto Level = curline->Subsector->sector->Level;
 			auto wallLightList = Level->lightlists.wall_dlist.find(curline->sidedef);
 			if (wallLightList != Level->lightlists.wall_dlist.end())
@@ -227,7 +235,6 @@ namespace swrenderer
 					if (node->lightsource->IsActive())
 					{
 						bool found = false;
-						noLights = false;
 						FLightNode *light_node = light_list;
 						while (light_node)
 						{
@@ -246,17 +253,6 @@ namespace swrenderer
 							light_list = newlight;
 						}
 					}
-				}
-			}
-
-			if (noLights)
-			{
-				while (light_list)
-				{
-					FLightNode *next = nullptr;
-					if (light_list->nextLight) next = light_list->nextLight;
-					delete light_list;
-					if (next) light_list = next;
 				}
 			}
 
