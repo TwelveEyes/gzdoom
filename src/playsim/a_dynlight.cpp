@@ -552,7 +552,7 @@ void FDynamicLight::CollectWithinRadius(const DVector3 &opos, FSection *section,
 		auto pos = collected_ss[i].pos;
 		section = collected_ss[i].sect;
 
-		auto updateFlatTList = [&](sector_t *sec)
+		auto updateFlatTList = [&](FSection *sec)
 		{
 			touchlists->flat_tlist.try_emplace(sec, sec);
 		};
@@ -565,13 +565,13 @@ void FDynamicLight::CollectWithinRadius(const DVector3 &opos, FSection *section,
 		node->targ = section;
 		node->lightsource = this;
 
-		auto flatLightList = Level->lightlists.flat_dlist.find(section->sector);
+		auto flatLightList = Level->lightlists.flat_dlist.find(section);
 		if (flatLightList != Level->lightlists.flat_dlist.end())
 		{
 			auto ret = flatLightList->second.try_emplace(this, node);
 			if (ret.second)
 			{
-				updateFlatTList(section->sector);
+				updateFlatTList(section);
 			}
 			else
 			{
@@ -581,8 +581,8 @@ void FDynamicLight::CollectWithinRadius(const DVector3 &opos, FSection *section,
 		else
 		{
 			std::unordered_map<FDynamicLight *, FLightNode *> u = { {this, node} };
-			Level->lightlists.flat_dlist.try_emplace(section->sector, u);
-			updateFlatTList(section->sector);
+			Level->lightlists.flat_dlist.try_emplace(section, u);
+			updateFlatTList(section);
 		}
 
 

@@ -117,7 +117,7 @@ int HWDrawInfo::SetupLightsForOtherPlane(subsector_t * sub, FDynLightData &light
 
 		lightdata.Clear();
 
-		auto flatLightList = Level->lightlists.flat_dlist.find(sub->section->sector);
+		auto flatLightList = Level->lightlists.flat_dlist.find(sub->section);
 
 		if (flatLightList != Level->lightlists.flat_dlist.end())
 		{

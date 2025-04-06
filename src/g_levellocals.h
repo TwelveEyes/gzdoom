@@ -62,7 +62,7 @@
 
 struct FGlobalDLightLists
 {
-	std::unordered_map<sector_t*, std::unordered_map<FDynamicLight*, FLightNode*>> flat_dlist;
+	std::unordered_map<FSection*, std::unordered_map<FDynamicLight*, FLightNode*>> flat_dlist;
 	std::unordered_map<side_t*, std::unordered_map<FDynamicLight*, FLightNode*>> wall_dlist;
 };
 

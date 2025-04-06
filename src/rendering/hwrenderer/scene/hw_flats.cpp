@@ -159,7 +159,7 @@ void HWFlat::SetupLights(HWDrawInfo *di, FDynLightData &lightdata, int portalgro
 		return;	// no lights on additively blended surfaces.
 	}
 
-	auto flatLightList = di->Level->lightlists.flat_dlist.find(sector);
+	auto flatLightList = di->Level->lightlists.flat_dlist.find(section);
 
 	if (flatLightList != di->Level->lightlists.flat_dlist.end())
 	{
